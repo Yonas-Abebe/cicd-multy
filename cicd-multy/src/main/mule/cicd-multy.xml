@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:tls="http://www.mulesoft.org/schema/mule/tls"
+	xmlns:email="http://www.mulesoft.org/schema/mule/email"
+	xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+	
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="576a44ef-c201-49b0-ae99-d233d5fe3148" >
+		<http:listener-connection host="${http.host}" port="${http.port}" />
+	</http:listener-config>
+	<configuration-properties doc:name="Configuration properties" doc:id="71d64030-927b-408c-8134-686f0012992d" file="configuration/local.properties" />
+	<global-property doc:name="Global Property" doc:id="bdddeb66-0e0e-4d9f-b35c-7ba0d5942d77" name="env" value="local" />
+	<db:config name="Database_Config" doc:name="Database Config" doc:id="61d02af6-84b4-4c75-bbbb-f50dea75d9d1" >
+		<db:mssql-connection host="${db.host}" instanceName="${db.instanceName}" port="${db.port}" user="${db.user}" password="${secure::db.password}" databaseName="${db.databaseName}" />
+	</db:config>
+	<ftp:config name="FTP_Config" doc:name="FTP Config" doc:id="1385d579-9c5a-401a-bd70-7b52cd4b7b20" >
+		<ftp:connection workingDir="${ftp.directory}" host="${ftp.host}" port="${ftp.port}" username="${ftp.username}" password="${secure::ftp.password}" />
+	</ftp:config>
+	<json-logger:config name="JSON_Logger_Config" doc:name="JSON Logger Config" doc:id="9b7f9f18-657d-4bee-b06f-77c3807da051" environment="${mule.env}" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure_Properties_Config" doc:id="f17c9e58-b078-4a56-850f-69166f01442c" file="configuration\local-secured.properties" key="Mayo7882*#*Redu2009*#*">
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
+	<email:smtp-config name="Email_SMTP" doc:name="Email_SMTP" doc:id="5ae83798-38fc-405b-b06e-3b63f014f26f">
+		<email:smtps-connection host="${email.host}" port="${email.port}" user="${email.user}" password="${secure::email.password}">
+	
+			<tls:context>
+				<tls:trust-store insecure="true" />
+			</tls:context>
+		</email:smtps-connection>
+	</email:smtp-config>
+	<flow name="cicd-multy" doc:id="d0450e2f-d1a6-4eff-9948-e678d83c38c1" >
+		<http:listener doc:name="Listener" doc:id="5c3afe4d-88fb-40ae-9404-b52531c6b953" config-ref="HTTP_Listener_config" path="${http.path}" />
+		<flow-ref doc:name="cicd-multiy-subflow" doc:id="34ebb165-f5a2-4bbc-bf77-a82ad868e74b" name="cicd-multiy-subflow" />
+	</flow>
+	<sub-flow name="cicd-multiy-subflow" doc:id="1c940be9-48d9-412b-b2aa-12901e97d33f" >
+		<json-logger:logger doc:id="ad908173-73ef-4556-9bc7-4f47db7c117e" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" doc:name="Start" />
+		<db:select doc:id="fdeff225-b25d-4e72-bde3-4dee820f7d69" config-ref="Database_Config" doc:name="Select" >
+			<db:sql ><![CDATA[select * from [dbo].[CICD]]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="94a2021a-8778-444e-94fb-a7b248eabb03" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ftp:write doc:id="a41611fa-27b8-4dde-9f80-0f9a4a117a07" config-ref="FTP_Config" path="multi-sys-cicd.txt" doc:name="ጸሃፊ" />
+		<email:send doc:name="Send" doc:id="b3197263-09a9-41c9-ab09-fd4c2bd81cba" config-ref="Email_SMTP" subject="Email without attachment">
+			<email:to-addresses>
+				<email:to-address value="1yonasabebe@gmail.com" />
+			</email:to-addresses>
+			<email:cc-addresses>
+				<email:cc-address value="yonexo78@gmail.com" />
+			</email:cc-addresses>
+			<email:body encoding="UTF-8">
+				<email:content><![CDATA["ሰላም የሀገር ልጆች! እንዴት ናችሁ? መልእክቱ  መጣ?" 
+]]></email:content>
+			</email:body>
+		</email:send>
+		<ee:transform doc:name="Transform Message" doc:id="862ebb09-f256-4add-8cf5-484c0f30b862" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Status": 200,
+	"message": "DB file fetched, written at FTP site, Confirmation Email sent successfully, Please check your email now!",
+ 	"Payload":  payload
+ }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:id="7ac2c70d-0058-4744-927e-fce9e1522ea5" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" doc:name="End" />
+	</sub-flow>
+</mule>
