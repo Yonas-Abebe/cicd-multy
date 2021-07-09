@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:ftp="http://www.mulesoft.org/schema/mule/ftp"
+	xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db" xmlns:json-logger="http://www.mulesoft.org/schema/mule/json-logger" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/json-logger http://www.mulesoft.org/schema/mule/json-logger/current/mule-json-logger.xsd
+http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/ftp http://www.mulesoft.org/schema/mule/ftp/current/mule-ftp.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<sub-flow name="cicd-multiy-subflow" doc:id="c93cd15c-388f-4e31-b358-19fea3f84c6d" >
+		<json-logger:logger doc:name="Start" doc:id="9b4e3f95-e32b-4f00-8a56-3d592fccca41" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" />
+		<db:select doc:name="Select" doc:id="57ffacd6-9bf6-4855-aa91-88232e01f2ed" config-ref="Database_Config" >
+			<db:sql ><![CDATA[select * from [dbo].[CICD]]]></db:sql>
+		</db:select>
+		<ee:transform doc:name="Transform Message" doc:id="c5b0f673-7ebb-495e-b41a-43af511145e0" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<ftp:write doc:name="ጸሃፊ" doc:id="bb7820a7-99fb-47d5-9c89-47a9a249b663" config-ref="FTP_Config" path="multi-sys-cicd.txt" />
+		<email:send doc:name="Send" doc:id="3f4b270c-80c0-464f-88aa-8ea47a4ea7d9" config-ref="Email_SMTP" subject="Email without attachment" >
+			<email:to-addresses >
+				<email:to-address value="1yonasabebe@gmail.com" />
+			</email:to-addresses>
+			<email:cc-addresses >
+				<email:cc-address value="yonexo78@gmail.com" />
+			</email:cc-addresses>
+			<email:body encoding="UTF-8" >
+				<email:content ><![CDATA["ሰላም የሀገር ልጆች! እንዴት ናችሁ? መልእክቱ  መጣ?" 
+]]></email:content>
+			</email:body>
+		</email:send>
+		<ee:transform doc:name="Transform Message" doc:id="b1e744f4-7aae-46f7-9bff-de6da7039235" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+---
+{
+	"Status": 200,
+	"message": "DB file fetched, written at FTP site, Confirmation Email sent successfully, Please check your email now!",
+ 	"Payload":  payload
+ }]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<json-logger:logger doc:name="End" doc:id="d4da8fe0-ecd3-4c9b-99e1-4d73c83703f6" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" />
+	</sub-flow>
+</mule>

@@ -35,48 +35,11 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 			</tls:context>
 		</email:smtps-connection>
 	</email:smtp-config>
+	
+	
+	
 	<flow name="cicd-multy" doc:id="d0450e2f-d1a6-4eff-9948-e678d83c38c1" >
 		<http:listener doc:name="Listener" doc:id="5c3afe4d-88fb-40ae-9404-b52531c6b953" config-ref="HTTP_Listener_config" path="${http.path}" />
 		<flow-ref doc:name="cicd-multiy-subflow" doc:id="34ebb165-f5a2-4bbc-bf77-a82ad868e74b" name="cicd-multiy-subflow" />
 	</flow>
-	<sub-flow name="cicd-multiy-subflow" doc:id="1c940be9-48d9-412b-b2aa-12901e97d33f" >
-		<json-logger:logger doc:id="ad908173-73ef-4556-9bc7-4f47db7c117e" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" doc:name="Start" />
-		<db:select doc:id="fdeff225-b25d-4e72-bde3-4dee820f7d69" config-ref="Database_Config" doc:name="Select" >
-			<db:sql ><![CDATA[select * from [dbo].[CICD]]]></db:sql>
-		</db:select>
-		<ee:transform doc:name="Transform Message" doc:id="94a2021a-8778-444e-94fb-a7b248eabb03" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-payload]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<ftp:write doc:id="a41611fa-27b8-4dde-9f80-0f9a4a117a07" config-ref="FTP_Config" path="multi-sys-cicd.txt" doc:name="ጸሃፊ" />
-		<email:send doc:name="Send" doc:id="b3197263-09a9-41c9-ab09-fd4c2bd81cba" config-ref="Email_SMTP" subject="Email without attachment">
-			<email:to-addresses>
-				<email:to-address value="1yonasabebe@gmail.com" />
-			</email:to-addresses>
-			<email:cc-addresses>
-				<email:cc-address value="yonexo78@gmail.com" />
-			</email:cc-addresses>
-			<email:body encoding="UTF-8">
-				<email:content><![CDATA["ሰላም የሀገር ልጆች! እንዴት ናችሁ? መልእክቱ  መጣ?" 
-]]></email:content>
-			</email:body>
-		</email:send>
-		<ee:transform doc:name="Transform Message" doc:id="862ebb09-f256-4add-8cf5-484c0f30b862" >
-			<ee:message >
-				<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
----
-{
-	"Status": 200,
-	"message": "DB file fetched, written at FTP site, Confirmation Email sent successfully, Please check your email now!",
- 	"Payload":  payload
- }]]></ee:set-payload>
-			</ee:message>
-		</ee:transform>
-		<json-logger:logger doc:id="7ac2c70d-0058-4744-927e-fce9e1522ea5" config-ref="JSON_Logger_Config" message='#["Here is my newly imported Json Logger in action!.............***************..............  Yoni"]' category="com.yoniJson.api.sample//optional" doc:name="End" />
-	</sub-flow>
 </mule>

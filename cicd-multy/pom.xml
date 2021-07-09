@@ -36,20 +36,18 @@
 							<artifactId>mssql-jdbc</artifactId>
 						</sharedLibrary>
 					</sharedLibraries>
-					
 					<cloudHubDeployment>
-                        <uri>https://anypoint.mulesoft.com</uri>
-                        <muleVersion>${mule.version}</muleVersion>
-                        <username>${anypoint.username}</username>
-                        <password>${anypoint.password}</password>
-                        <environment>${env}</environment>
-                        <applicationName>${appname}</applicationName>
-                        <businessGroup>${business}</businessGroup>
-                        <workerType>${vCore}</workerType>
-                        <workers>${workers}</workers>
-                        <objectStoreV2>true</objectStoreV2>
-</cloudHubDeployment>
-					
+						<uri>https://anypoint.mulesoft.com</uri>
+						<muleVersion>${mule.version}</muleVersion>
+						<username>${anypoint.username}</username>
+						<password>${anypoint.password}</password>
+						<environment>${env}</environment>
+						<applicationName>${appname}</applicationName>
+						<businessGroup>${business}</businessGroup>
+						<workerType>${vCore}</workerType>
+						<workers>${workers}</workers>
+						<objectStoreV2>true</objectStoreV2>
+					</cloudHubDeployment>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -108,6 +106,12 @@
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
 			<version>6.2.2.jre8</version>
+		</dependency>
+		<dependency>
+			<groupId>com.mulesoft.connectors</groupId>
+			<artifactId>mule-amqp-connector</artifactId>
+			<version>1.7.1</version>
+			<classifier>mule-plugin</classifier>
 		</dependency>
 	</dependencies>
 
