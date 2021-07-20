@@ -22,7 +22,7 @@ payload]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
 		<ftp:write doc:name="ጸሃፊ" doc:id="bb7820a7-99fb-47d5-9c89-47a9a249b663" config-ref="FTP_Config" path="multi-sys-cicd.txt" />
-		<email:send doc:name="Send" doc:id="3f4b270c-80c0-464f-88aa-8ea47a4ea7d9" config-ref="Email_SMTP" subject="Email without attachment" >
+		<email:send doc:name="Send | ላኪ" doc:id="3f4b270c-80c0-464f-88aa-8ea47a4ea7d9" config-ref="Email_SMTP" subject="Email without attachment" >
 			<email:to-addresses >
 				<email:to-address value="1yonasabebe@gmail.com" />
 			</email:to-addresses>
